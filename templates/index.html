@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Resume Screening System</title>
+
+<style>
+:root{
+  --bg:#f7f9fc;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --primary:#6366f1;
+  --secondary:#ec4899;
+  --accent:#22c55e;
+  --border:#e5e7eb;
+}
+
+.dark{
+  --bg:#0f172a;
+  --card:#111827;
+  --text:#f9fafb;
+  --muted:#9ca3af;
+  --border:#1f2937;
+}
+
+*{
+  box-sizing:border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+
+#app{
+  min-height:100vh;
+  padding:40px 20px;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+}
+
+header{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.title{
+  font-size:3rem;
+  font-weight:800;
+  background:linear-gradient(90deg,var(--primary),var(--secondary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:1.1rem;
+}
+
+.toggle{
+  position:absolute;
+  top:20px;
+  right:20px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 14px;
+  cursor:pointer;
+}
+
+.form-card{
+  background:var(--card);
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 20px 40px rgba(0,0,0,.06);
+  animation:fadeUp .6s ease;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(15px)}
+  to{opacity:1;transform:none}
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+label{
+  font-weight:600;
+  margin-bottom:6px;
+  display:block;
+}
+
+textarea{
+  width:100%;
+  min-height:160px;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  resize:vertical;
+  background:transparent;
+  color:var(--text);
+  white-space:pre-wrap;
+}
+
+textarea:focus{
+  outline:none;
+  border-color:var(--primary);
+}
+
+.actions{
+  margin-top:20px;
+  display:flex;
+  gap:12px;
+}
+
+button{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.analyze{
+  background:linear-gradient(90deg,var(--primary),var(--secondary));
+  color:white;
+}
+
+.reset{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text);
+}
+
+.results{
+  margin-top:30px;
+  background:var(--card);
+  border-radius:18px;
+  padding:25px;
+  animation:fadeUp .6s ease;
+}
+
+.score{
+  font-size:3rem;
+  font-weight:800;
+  color:var(--accent);
+}
+
+.skills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.tag{
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:.9rem;
+  background:var(--bg);
+  border:1px solid var(--border);
+}
+
+footer{
+  margin-top:40px;
+  text-align:center;
+  color:var(--muted);
+  font-size:.9rem;
+}
+.progress-wrap{
+  margin:15px 0 25px;
+}
+
+.progress-bar{
+  width:100%;
+  height:14px;
+  background:var(--border);
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#22c55e,#16a34a);
+  width:0;
+  animation:growBar 1s ease forwards;
+}
+
+@keyframes growBar{
+  from{width:0}
+}
+.tag.matched{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:white;
+  border:none;
+}
+
+.tag.missing{
+  background:linear-gradient(135deg,#fb7185,#f97316);
+  color:white;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<button class="toggle" onclick="toggleTheme()">🌙</button>
+
+<div class="container">
+<header>
+  <h1 class="title">AI-Based Resume Screening System</h1>
+  <p class="subtitle">Smart skill matching using NLP & similarity scoring</p>
+</header>
+
+<form method="POST" class="form-card">
+  <div class="grid">
+    <div>
+      <label>📄 Resume Text</label>
+      <textarea name="resume_text" placeholder="Paste resume here...">{{ resume_text | default("") }}</textarea>
+    </div>
+    <div>
+      <label>📝 Job Description</label>
+      <textarea name="job_text" placeholder="Paste job description here...">{{ jd_text | default("") }}</textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="analyze" type="submit">Analyze Match</button>
+    <button class="reset" type="button" onclick="resetForm()">Reset</button>
+  </div>
+</form>
+
+{% if result %}
+<div class="results">
+  
+<div class="score">{{ result.match }}%</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar">
+    <div class="progress-fill" style="width: {{ result.match }}%"></div>
+  </div>
+</div>
+  <h3>Matched Skills</h3>
+  <div class="skills">
+    {% for s in result.matched %}
+      <span class="tag matched">{{ s }}</span>    {% endfor %}
+  </div>
+
+  <h3 style="margin-top:16px;">Missing Skills</h3>
+  <div class="skills">
+    {% for s in result.missing %}
+      <span class="tag missing">{{ s }}</span>    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<footer>
+  AI Resume Screening System • Skill-based ATS Matching
+</footer>
+</div>
+</div>
+
+<script>
+function toggleTheme(){
+  const app = document.getElementById("app");
+  app.classList.toggle("dark");
+
+  const btn = document.querySelector(".toggle");
+  btn.textContent = app.classList.contains("dark") ? "☀️" : "🌙";
+}
+
+function resetForm(){
+  document.querySelectorAll("textarea").forEach(t => t.value = "");
+  const r = document.querySelector(".results");
+  if(r) r.remove();
+  window.history.replaceState({}, document.title, "/");
+}
+</script></body>
+</html>
