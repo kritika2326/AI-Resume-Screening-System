@@ -28,12 +28,7 @@ SKILLS = {
     "CI/CD pipelines"
 }
 
-# ---------------- NEGATIONS ----------------
-NEGATIONS = {
-    "no", "not", "never", "without",
-    "no experience", "never used",
-    "dont", "do not", "did not"
-}
+
 
 # ---------------- TEXT CLEANING ----------------
 def clean_text(text):
@@ -110,4 +105,4 @@ def index():
 )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
