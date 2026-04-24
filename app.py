@@ -24,7 +24,7 @@ SKILLS = {
     "git", "github", "docker", "linux",
 
     # Cloud & DevOps
-    "aws", "azure", "ci/cd"
+    "aws", "azure", "ci/cd",
     "CI/CD pipelines"
 }
 
@@ -113,4 +113,4 @@ import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port))
+    app.run(host="0.0.0.0", port=port)
