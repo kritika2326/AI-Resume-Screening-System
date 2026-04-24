@@ -28,7 +28,12 @@ SKILLS = {
     "CI/CD pipelines"
 }
 
-
+# ---------------- NEGATIONS ----------------
+NEGATIONS = {
+    "no", "not", "never", "without",
+    "no experience", "never used",
+    "dont", "do not", "did not"
+}
 
 # ---------------- TEXT CLEANING ----------------
 def clean_text(text):
@@ -48,8 +53,8 @@ def extract_skills(text):
         pattern = r"\b" + re.escape(skill) + r"\b"
 
         for match in re.finditer(pattern, text):
-            before_start = max(0, match.start() - 40)
-            after_end = min(len(text), match.end() + 40)
+            before_start = max(0, match.start() - 7)
+            after_end = min(len(text), match.end() + 7)
 
             before_context = text[before_start:match.start()]
             after_context = text[match.end():after_end]
@@ -104,5 +109,8 @@ def index():
     jd_text=job_text if request.method == "POST" else ""
 )
 
+import os
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port))
